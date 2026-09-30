@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MUÉVETE MÁS · Administración</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#667085;--line:#e5e7eb;--primary:#e11d48;--soft:#fff1f2;--good:#15803d}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:1180px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:20px}.brand{font-weight:800;font-size:22px}.muted{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 18px rgba(16,24,40,.05)}
+.login{max-width:430px;margin:8vh auto}.login h1{margin-top:0}.field{margin:12px 0}.field label{display:block;font-size:14px;font-weight:700;margin-bottom:6px}.field input{width:100%;padding:13px;border:1px solid #d0d5dd;border-radius:12px;font-size:16px}
+button{border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}.primary{background:var(--primary);color:white}.secondary{background:#eef2f6;color:#172033}.ghost{background:transparent;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}.metric .label{color:var(--muted);font-size:13px}.metric .num{font-size:30px;font-weight:850;margin-top:6px}
+.section{margin:24px 0 10px;font-size:18px;font-weight:800}.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:760px}.table th,.table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}.table th{color:var(--muted);font-size:12px;text-transform:uppercase}.pill{display:inline-block;background:var(--soft);padding:5px 9px;border-radius:999px;font-weight:700}.status{padding:10px 12px;border-radius:12px;background:#ecfdf3;color:var(--good);margin-bottom:14px}.error{background:#fef2f2;color:#b42318}.actions{display:flex;gap:8px;flex-wrap:wrap}.small{font-size:13px}.footer{margin-top:28px;color:var(--muted);font-size:12px}
+@media(max-width:800px){.wrap{padding:14px}.top{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:repeat(2,1fr)}.metric .num{font-size:25px}}
+</style>
+</head>
+<body>
+<div id="loginView" class="wrap"><div class="card login">
+<div class="brand">❤️ MUÉVETE MÁS</div><h1>Panel administrativo</h1><p class="muted">Acceso exclusivo para administradores autorizados.</p>
+<div class="field"><label>Correo</label><input id="email" type="email" autocomplete="username"></div>
+<div class="field"><label>Contraseña</label><input id="password" type="password" autocomplete="current-password"></div>
+<button class="primary" style="width:100%" onclick="login()">🔐 Ingresar</button>
+<p id="loginMsg" class="small muted"></p>
+</div></div>
+<div id="app" style="display:none"><div class="wrap">
+<div class="top"><div><div class="brand">❤️ MUÉVETE MÁS · Administración</div><div class="muted">Reto oficial · actividad del 1 al 30 de octubre · cierre 31 de octubre</div></div><div class="actions"><button class="secondary" onclick="loadAll()">↻ Actualizar</button><button class="ghost" onclick="logout()">Cerrar sesión</button></div></div>
+<div id="status" class="status">Sesión administrativa activa.</div>
+<div class="grid" id="metrics"></div>
+<div class="section">🏆 Clasificación general</div><div class="card"><div class="actions" style="margin-bottom:12px"><button class="secondary" onclick="exportCSV()">📥 Exportar resultados CSV</button></div><div class="tablewrap"><table class="table"><thead><tr><th>Pos.</th><th>Participante</th><th>Grupo</th><th>Nivel</th><th>Días</th><th>Minutos</th><th>⭐</th><th>Condición crónica</th><th>Registro</th></tr></thead><tbody id="ranking"></tbody></table></div></div>
+<div class="section">👥 Resultados por grupo</div><div class="card"><div class="tablewrap"><table class="table"><thead><tr><th>Grupo</th><th>Participantes</th><th>Activos</th><th>Días</th><th>Minutos</th><th>⭐</th></tr></thead><tbody id="groups"></tbody></table></div></div>
+<div class="section">🔐 Privacidad</div><div class="card"><p style="margin-top:0">La condición crónica solo se muestra aquí a administradores autorizados. No aparece en el ranking público ni en la exportación. La exportación tampoco incluye correo ni credenciales. El acceso administrativo está controlado por una lista de administradores en Supabase.</p><p class="small muted" style="margin-bottom:0">La clave secreta/service_role nunca debe colocarse en este archivo ni en el navegador.</p></div>
+<div class="footer">MUÉVETE MÁS POR TU CORAZÓN · Panel administrativo</div>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script>
+<script>
+let sb=null,rankingRows=[],groupRows=[];
+function init(){if(!window.MMC_SUPABASE_URL||!window.MMC_SUPABASE_KEY){$('loginMsg').textContent='Falta la configuración de Supabase.';return false}sb=window.supabase.createClient(window.MMC_SUPABASE_URL,window.MMC_SUPABASE_KEY,{auth:{persistSession:true,detectSessionInUrl:true}});return true}
+const $=id=>document.getElementById(id);
+async function login(){const email=$('email').value.trim(),password=$('password').value;if(!email||!password){$('loginMsg').textContent='Completa correo y contraseña.';return}if(!sb)return;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error){$('loginMsg').textContent='No fue posible iniciar sesión. Verifica tus datos.';return}await showApp(data.user)}
+async function showApp(user){const {data,isAdmin,error}=await sb.rpc('is_admin');if(error||!isAdmin){await sb.auth.signOut();$('loginMsg').textContent='Esta cuenta no está autorizada como administradora.';return}$('loginView').style.display='none';$('app').style.display='block';await loadAll()}
+async function loadAll(){if(!sb)return;const {data:s,error:se}=await sb.rpc('admin_dashboard_summary');if(se){$('status').className='status error';$('status').textContent='No se pudo cargar el panel: '+se.message;return}$('status').className='status';$('status').textContent='Sesión administrativa activa · datos actualizados.';const m=s&&s[0]?s[0]:{};$('metrics').innerHTML=[['Participantes',m.participants_count||0],['Activos',m.active_participants||0],['Días activos',m.total_active_days||0],['Minutos',m.total_minutes||0],['Estrellas',m.total_points||0]].map(x=>`<div class="card metric"><div class="label">${x[0]}</div><div class="num">${Number(x[1]).toLocaleString('es-CO')}</div></div>`).join('');const r=await sb.rpc('admin_ranking');if(r.error){$('ranking').innerHTML='<tr><td colspan="9">No se pudo cargar la clasificación.</td></tr>'}else{rankingRows=r.data||[];$('ranking').innerHTML=rankingRows.map(x=>`<tr><td>${x.position<=3?['🥇','🥈','🥉'][x.position-1]:x.position}</td><td><b>${esc(x.display_name)}</b></td><td>${esc(x.group_name)}</td><td>${esc(x.activity_level)}</td><td>${x.active_days}</td><td>${x.total_minutes}</td><td><span class="pill">${x.points} ⭐</span></td><td>${esc(x.condition_name||'Ninguno registrado')}</td><td>${new Date(x.registered_at).toLocaleDateString('es-CO')}</td></tr>`).join('')}const g=await sb.rpc('admin_group_stats');if(g.error){$('groups').innerHTML='<tr><td colspan="6">No se pudieron cargar los grupos.</td></tr>'}else{groupRows=g.data||[];$('groups').innerHTML=groupRows.map(x=>`<tr><td><b>${esc(x.group_name)}</b></td><td>${x.participants_count}</td><td>${x.active_participants}</td><td>${x.active_days}</td><td>${x.total_minutes}</td><td>${x.total_points} ⭐</td></tr>`).join('')}}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+async function exportCSV(){const {data,error}=await sb.rpc('admin_export_results');if(error){alert('No fue posible exportar: '+error.message);return}const rows=data||[];const head=['Participante','Grupo','Nivel inicial','Días activos','Minutos','Estrellas','Fecha de registro'];const csv=[head,...rows.map(x=>[x.participant_name,x.group_name,x.activity_level,x.active_days,x.total_minutes,x.points,new Date(x.registered_at).toLocaleDateString('es-CO')])].map(row=>row.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(';')).join('\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='muevete_mas_resultados.csv';a.click();URL.revokeObjectURL(a.href)}
+async function logout(){await sb.auth.signOut();$('app').style.display='none';$('loginView').style.display='block';$('password').value='';$('loginMsg').textContent='Sesión cerrada.'}
+init();
+</script>
+</body></html>

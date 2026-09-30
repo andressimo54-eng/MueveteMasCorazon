@@ -1,0 +1,4 @@
+# Local/project artifacts
+*.zip
+*.log
+.DS_Store

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#e85d68">
+<meta name="description" content="Reto institucional de actividad física de 30 días">
+<link rel="manifest" href="manifest.json">
+<title>Muévete más por tu corazón</title>
+<style>
+:root{--pink:#e85d68;--teal:#35a49e;--dark:#18353d;--muted:#718188;--bg:#f4f7f8;--white:#fff;--line:#e3eaec}
+*{box-sizing:border-box}body{margin:0;background:#dce7e9;color:var(--dark);font-family:Arial,system-ui,sans-serif}
+.app{width:min(100%,430px);min-height:100vh;margin:auto;background:var(--bg);padding-bottom:82px}
+header{background:white;padding:18px 18px 14px;border-bottom:1px solid var(--line);font-size:18px;font-weight:800;position:sticky;top:0;z-index:5}
+header b{color:var(--pink)}main{padding:17px}.screen{display:none}.screen.active{display:block}
+.hero,.card{background:white;border-radius:20px;padding:18px;box-shadow:0 5px 18px rgba(0,0,0,.06);margin-bottom:13px}
+.hero{background:linear-gradient(135deg,#fff,#fff5f6)}h1{font-size:27px;line-height:1.08;margin:7px 0}h2{font-size:20px;margin:6px 0 9px}.muted{color:var(--muted);font-size:13px;line-height:1.45}.badge{display:inline-block;background:#ffeff1;color:#c64c59;border-radius:30px;padding:6px 10px;font-size:10px;font-weight:800}
+.section{font-weight:800;font-size:18px;margin:20px 0 10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.stat{background:#fff;border-radius:18px;padding:14px;box-shadow:0 5px 18px rgba(0,0,0,.04)}.stat .emoji{font-size:20px}.num{font-size:25px;font-weight:800;margin-top:4px}.label{font-size:11px;color:var(--muted)}
+.input,select{width:100%;padding:13px;border:1px solid #d7e0e2;border-radius:13px;font-size:15px;background:#fff;margin:5px 0 10px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:9px}.choices button{min-height:53px;background:#fff;border:1px solid var(--line);color:var(--dark);text-align:left}.choices button.sel{border:2px solid var(--teal);background:#eef9f8}
+button{border:0;border-radius:13px;padding:12px 14px;font-weight:800;font-size:14px;cursor:pointer}.primary{width:100%;background:var(--pink);color:white;margin-top:10px}.secondary{background:#eaf6f5;color:#267b76}.ghost{background:transparent;color:var(--muted);padding-left:0}
+.progress{height:10px;background:#e8eeee;border-radius:20px;overflow:hidden;margin:13px 0 6px}.bar{height:100%;background:var(--teal);width:3%}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.small{font-size:12px;color:var(--muted)}
+.duration-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px}.duration-option{border:1px solid var(--line);background:#fff;border-radius:16px;padding:14px 8px;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;min-height:92px;cursor:pointer}.duration-option b{font-size:16px}.duration-option span{font-size:13px}.duration-option.sel{border:2px solid #111;background:#fff7f8;transform:translateY(-1px)}@media(max-width:520px){.duration-grid{grid-template-columns:1fr}.duration-option{min-height:70px;flex-direction:row;justify-content:space-between;padding:12px 16px}}.activity{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.icon{width:40px;height:40px;border-radius:13px;background:#fff0f1;display:grid;place-items:center;font-size:19px;flex:none}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,430px);height:70px;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;z-index:10;overflow-x:auto}.nav button{background:transparent;color:#77868b;padding:6px 4px;font-size:11px}.nav button.active{color:var(--pink)}
+.rank{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.rank strong{margin-left:auto}
+.toast{position:fixed;left:50%;bottom:83px;transform:translateX(-50%);background:#17343b;color:white;padding:11px 15px;border-radius:13px;font-size:13px;display:none;z-index:20;max-width:390px;text-align:center}
+.notice{padding:11px;background:#eef8f7;color:#397873;border-radius:12px;font-size:11px;line-height:1.4}.accountbox{background:#fff;border-radius:18px;padding:15px;box-shadow:0 5px 18px rgba(0,0,0,.04);margin-top:12px}.accountbox h3{margin:0 0 7px}.account-status{padding:10px;border-radius:12px;background:#f4f7f8;font-size:12px;line-height:1.45}.account-status.ok{background:#eaf6f5;color:#267b76}.account-status.warn{background:#fff5e8;color:#8b5a16}.account-actions{display:grid;gap:8px;margin-top:10px}.danger{background:#fff0f1;color:#b74653}.days{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.daybox{padding:9px 4px;border-radius:12px;text-align:center;background:#f5f8f8;font-size:11px}.daybox b{display:block;font-size:13px}.daybox.done{background:#eaf6f5;color:#267b76}.daybox.today{outline:2px solid #e85d68;background:#fff4f5}.daybox.locked{opacity:.45}.success{background:#eef8f7;padding:12px;border-radius:13px;font-size:12px;color:#397873}.rule{padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;line-height:1.4}.rule:last-child{border-bottom:0}.me{background:#fff5f6;border-radius:12px;padding:10px}.rank small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+
+/* V10 · experiencia móvil moderna */
+:root{--pink:#e85d68;--pink2:#f47b85;--teal:#35a49e;--dark:#18353d;--muted:#718188;--bg:#f6f8f8;--white:#fff;--line:#e6edef;--shadow:0 10px 30px rgba(24,53,61,.08)}
+body{background:#e9eff0}.app{background:linear-gradient(180deg,#f8fafb 0%,#f4f7f8 55%,#f8fafb 100%)}
+header{padding:15px 18px 13px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(230,237,239,.9)}
+.header-brand{display:flex;align-items:center;gap:9px}.heart-logo{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#fff0f2,#ffe0e4);font-size:18px}.header-title{font-size:15px;font-weight:900;line-height:1.05}.header-title span{display:block;color:var(--pink)}
+.header-status{font-size:10px;font-weight:800;color:#267b76;background:#eaf6f5;padding:6px 9px;border-radius:20px}
+.hero.modern{position:relative;overflow:hidden;padding:21px;background:linear-gradient(145deg,#fff 0%,#fff5f6 100%);box-shadow:var(--shadow)}
+.hero.modern:after{content:'❤️';position:absolute;right:-5px;top:-18px;font-size:100px;opacity:.06;transform:rotate(12deg)}
+.hello-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.greeting{font-size:25px;font-weight:900;line-height:1.08;margin:7px 0 4px;max-width:260px}.streak-pill{background:#fff;border:1px solid #f3d9dc;border-radius:18px;padding:8px 10px;text-align:center;min-width:64px;box-shadow:0 5px 14px rgba(232,93,104,.08)}.streak-pill b{display:block;font-size:18px;color:var(--pink)}.streak-pill span{font-size:9px;color:var(--muted);font-weight:800}
+.progress{height:9px;background:#e9eff0;border-radius:99px;overflow:hidden;margin:15px 0 7px}.bar{background:linear-gradient(90deg,var(--pink),var(--pink2));border-radius:99px;transition:width .35s ease}
+.progress-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.section{font-size:16px;margin:21px 1px 9px}.today-card{padding:18px;border-radius:21px;background:linear-gradient(135deg,#18353d,#27545e);color:#fff;box-shadow:0 12px 28px rgba(24,53,61,.16);position:relative;overflow:hidden}.today-card:after{content:'➜';position:absolute;right:20px;bottom:17px;font-size:26px;opacity:.18}.today-card h2{font-size:20px;margin:7px 0}.today-card .muted{color:#cbd8da}.today-card .primary{margin-top:13px;background:#fff;color:#18353d}
+.stat{border:1px solid rgba(230,237,239,.9);box-shadow:0 7px 20px rgba(24,53,61,.05)}.stat .emoji{font-size:18px}.num{font-size:23px}.achievement-strip{display:flex;gap:9px;overflow:auto;padding:2px 1px 4px}.mini-achievement{min-width:126px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 6px 17px rgba(24,53,61,.04)}.mini-achievement .aicon{font-size:20px}.mini-achievement b{display:block;font-size:12px;margin-top:4px}.mini-achievement span{font-size:10px;color:var(--muted)}
+.profile-card{display:flex;align-items:center;gap:12px;padding:15px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 7px 20px rgba(24,53,61,.05)}.avatar{width:45px;height:45px;border-radius:15px;background:linear-gradient(135deg,#ffe6e9,#eaf6f5);display:grid;place-items:center;font-size:20px}.profile-card .pcopy{min-width:0;flex:1}.profile-card .pcopy b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.profile-card .pcopy span{font-size:10px;color:var(--muted)}
+.account-menu{display:grid;gap:9px;margin-top:13px}.menu-item{width:100%;background:#fff;border:1px solid var(--line);border-radius:17px;padding:13px 14px;display:flex;align-items:center;gap:12px;text-align:left;color:var(--dark);box-shadow:0 6px 18px rgba(24,53,61,.04)}.menu-icon{width:38px;height:38px;border-radius:13px;background:#f4f7f8;display:grid;place-items:center;font-size:18px;flex:none}.menu-item .mcopy{flex:1}.menu-item .mcopy b{display:block;font-size:13px}.menu-item .mcopy span{display:block;font-size:10px;color:var(--muted);margin-top:2px}.menu-arrow{color:#9aa8ac;font-size:18px}.menu-item.logout{color:#b74653}.menu-item.logout .menu-icon{background:#fff0f1}.advanced-box{margin-top:16px;background:#fffaf2;border:1px solid #f1e3c8;border-radius:17px;padding:14px}.advanced-box b{font-size:12px;color:#8b5a16}.advanced-box p{font-size:10px;color:#7f7464;line-height:1.4;margin:5px 0 10px}.advanced-box button{background:#fff0f1;color:#b74653;width:100%}
+.nav{height:76px;border-top:1px solid rgba(230,237,239,.95);box-shadow:0 -8px 25px rgba(24,53,61,.06);padding:6px 4px calc(6px + env(safe-area-inset-bottom));overflow:visible}.nav button{font-size:9px;min-width:52px;position:relative}.nav button.active{color:var(--pink)}.nav .nav-plus{width:54px;height:54px;margin-top:-25px;border-radius:18px;background:linear-gradient(145deg,var(--pink),var(--pink2));color:#fff;box-shadow:0 10px 22px rgba(232,93,104,.28);font-size:10px}.nav .nav-plus span{font-size:23px;line-height:1}
+.accountbox{box-shadow:var(--shadow);border:1px solid var(--line)}
+.empty-state{padding:18px;text-align:center;background:#fff;border-radius:18px;border:1px dashed #dce5e7}.empty-state .big{font-size:30px}.empty-state b{display:block;margin-top:5px}
+@media(max-width:520px){main{padding:15px}.hero.modern{padding:18px}.greeting{font-size:23px}.grid{gap:9px}.nav{width:100%}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="header-brand"><div class="heart-logo">❤️</div><div class="header-title">MUÉVETE MÁS<span>por tu corazón</span></div></div><div class="header-status" id="topStatus">30 DÍAS</div></header>
+<main>
+
+<section id="profile" class="screen active">
+<div class="hero"><span class="badge">RETO · 30 DÍAS</span><h1>Empecemos a movernos</h1><p class="muted">Reto oficial: <b>1 al 31 de octubre de 2026</b>. Puedes inscribirte antes del inicio y comenzar a registrar actividad desde el 1 de octubre.</p></div>
+<div class="notice" style="margin-top:12px"><b>Inscripción en 3 pasos</b><br>1. Completa tus datos · 2. Vincula tu correo · 3. Comienza tu reto.</div>
+<div class="section">Nombre</div><input id="name" class="input" placeholder="Nombre completo" autocomplete="name">
+<div class="section">Grupo</div>
+<div class="choices" id="groups">
+<button data-v="Ambulatorios">🏥 Ambulatorios</button>
+<button data-v="Más Bienestar Hogar">🤝 Más Bienestar Hogar</button>
+<button data-v="Equipo PSPIC">❤️ Equipo PSPIC</button>
+<button data-v="Administrativo">💼 Administrativo</button>
+</div>
+<div class="section">Actividad habitual</div>
+<div class="choices" id="levels">
+<button data-v="Sedentario">🟢 Sedentario</button>
+<button data-v="Actividad ocasional">🟡 Ocasional</button>
+<button data-v="Actividad diaria">🔵 Diaria</button>
+</div>
+<div class="section">¿Tienes diagnóstico crónico? <span class="small">(opcional)</span></div>
+<div class="choices" id="conditions">
+<button data-v="Ninguno">Ninguno</button><button data-v="Diabetes">Diabetes</button>
+<button data-v="Hipertensión">Hipertensión</button><button data-v="EPOC">EPOC</button>
+<button data-v="Asma">Asma</button><button data-v="Cáncer">Cáncer</button>
+</div>
+<div class="notice">🔒 Los datos de salud son opcionales y no forman parte del ranking de equipos.</div>
+<div class="section">📧 Correo para proteger tu progreso</div>
+<input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="tu-correo@ejemplo.com">
+<p class="small">Te enviaremos un correo de confirmación. La contraseña se crea ahora y será la que usarás para volver a entrar.</p>
+<div class="section">🔐 Crea tu contraseña</div><input id="signupPassword" class="input" type="password" minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+<div class="section">🔐 Repite tu contraseña</div><input id="signupPassword2" class="input" type="password" minlength="8" autocomplete="new-password" placeholder="Repite la contraseña">
+<button class="primary" id="start">Crear mi inscripción ❤️</button>
+<div id="loggedOutLogin" class="accountbox" style="display:block;margin-top:14px"><h3>¿Ya estás inscrito?</h3><p class="small">Confirma tu correo y usa tu contraseña para entrar y recuperar tu reto.</p><input id="startLoginEmail" class="input" type="email" autocomplete="email" placeholder="tu-correo@ejemplo.com"><input id="startLoginPassword" class="input" type="password" autocomplete="current-password" placeholder="Contraseña"><button class="secondary" style="width:100%" onclick="loginFromStart()">👤 Iniciar sesión</button><button class="ghost" style="margin-top:8px" onclick="recoverFromStart()">¿Olvidaste tu contraseña?</button></div>
+</section>
+
+<section id="home" class="screen">
+<div class="hero modern"><div class="hello-row"><div><span class="badge" id="badge">NIVEL 1</span><h1 class="greeting" id="hello">¡Hola!</h1><p class="muted" style="margin:0">Día <b id="day">1</b> de 30 · sigue avanzando</p></div><div class="streak-pill"><b id="streakTop">0</b><span>🔥 RACHA</span></div></div><div class="progress"><div class="bar" id="bar"></div></div><div class="progress-meta"><span>Tu progreso</span><b id="pct">3%</b></div></div>
+<div class="grid">
+<div class="stat"><span class="emoji">📅</span><div class="num" id="activeDays">0</div><div class="label">días activos</div></div>
+<div class="stat"><span class="emoji">⏱️</span><div class="num" id="mins">0</div><div class="label">minutos acumulados</div></div>
+<div class="stat"><span class="emoji">⭐</span><div class="num" id="points">0</div><div class="label">estrellas</div></div>
+<div class="stat"><span class="emoji">🔥</span><div class="num" id="streak">0</div><div class="label">racha actual</div></div>
+</div>
+<div class="section">🎯 Misión de hoy</div>
+<div class="today-card"><span class="badge" style="background:rgba(255,255,255,.14);color:#fff">HOY CUENTA</span><h2 id="today">5 minutos de movimiento</h2><p class="muted" id="todayDesc">Cada movimiento cuenta.</p><button class="primary" onclick="show('activity')">＋ Registrar mi actividad</button></div>
+<div class="section">🌟 Tus avances</div>
+<div class="achievement-strip"><div class="mini-achievement"><div class="aicon">🔥</div><b id="streakCard">0 días de racha</b><span>Sigue mañana</span></div><div class="mini-achievement"><div class="aicon">⭐</div><b id="starsCard">0 estrellas</b><span>Acumuladas</span></div><div class="mini-achievement"><div class="aicon">🏆</div><b>Reto 30 días</b><span>Tu constancia cuenta</span></div></div>
+<div class="section">👤 Mi perfil</div>
+<div class="profile-card"><div class="avatar">❤️</div><div class="pcopy"><b id="summary">Mi perfil</b><span id="health">Información de salud privada</span></div><button class="secondary" onclick="show('account');renderAccount()">Ver</button></div>
+</section>
+
+<section id="account" class="screen">
+<button class="ghost" onclick="show('home')">← Volver al inicio</button>
+<h1>👤 Mi perfil</h1><p class="muted">Administra tu cuenta, protege tu progreso y consulta tus datos del reto.</p>
+<div class="profile-card"><div class="avatar">❤️</div><div class="pcopy"><b id="accountNameDisplay">Mi participante</b><span id="accountTeamDisplay">Mi equipo</span></div><div class="header-status" id="accountCloudBadge">CUENTA</div></div>
+<div class="account-menu">
+<button class="menu-item" onclick="showAccountSecurity()"><div class="menu-icon">🔐</div><div class="mcopy"><b>Mi cuenta</b><span>Correo, acceso y protección de progreso</span></div><div class="menu-arrow">›</div></button>
+<button class="menu-item" onclick="show('challenge')"><div class="menu-icon">🎯</div><div class="mcopy"><b>Mi reto</b><span>Calendario, metas y evaluaciones</span></div><div class="menu-arrow">›</div></button>
+<button class="menu-item" onclick="show('achievements')"><div class="menu-icon">🏆</div><div class="mcopy"><b>Mis logros</b><span>Reconocimientos por tu constancia</span></div><div class="menu-arrow">›</div></button>
+<button class="menu-item" onclick="showPrivacyInfo()"><div class="menu-icon">🔒</div><div class="mcopy"><b>Privacidad</b><span>Tus datos de salud no aparecen en el ranking</span></div><div class="menu-arrow">›</div></button>
+<button class="menu-item logout" id="logoutMenuBtn" onclick="logoutPermanent()"><div class="menu-icon">🚪</div><div class="mcopy"><b>Cerrar sesión</b><span>Tu progreso seguirá guardado</span></div><div class="menu-arrow">›</div></button>
+</div>
+<div class="accountbox" id="securityBox" style="margin-top:13px">
+<h3 id="accountTitle">🔐 Mi cuenta</h3>
+<div id="accountStatus" class="account-status">Tu cuenta queda vinculada a tu correo y protegida con contraseña.</div>
+<div id="accountPermanent" class="account-actions"><button class="secondary" onclick="show('home')">❤️ Continuar con mi reto</button></div>
+</div>
+<div class="accountbox" id="loginBox"><h3>¿Ya tienes una cuenta?</h3><p class="small">Si ya realizaste la inscripción y confirmaste tu correo, inicia sesión para recuperar tu reto y continuar donde lo dejaste.</p><input id="loginEmail" class="input" type="email" autocomplete="email" placeholder="tu-correo@ejemplo.com"><input id="loginPassword" class="input" type="password" autocomplete="current-password" placeholder="Contraseña"><button class="secondary" style="width:100%" onclick="loginAccount()">👤 Iniciar sesión</button><button class="ghost" style="margin-top:8px" onclick="recoverPassword()">¿Olvidaste tu contraseña?</button></div>
+</section>
+
+<section id="activity" class="screen">
+<button class="ghost" onclick="show('home')">← Volver</button><h1>👣 Actividad</h1><p class="muted">Registra también la intensidad.</p>
+<div class="section">Tipo</div>
+<div class="choices" id="types">
+<button data-v="Caminata">🚶 Caminata</button><button data-v="Bicicleta">🚴 Bicicleta</button><button data-v="Baile">💃 Baile</button><button data-v="Fuerza">🏋️ Fuerza</button><button data-v="Natación">🏊 Natación</button><button data-v="Deporte">⚽ Deporte</button><button data-v="Movilidad">🧘 Movilidad</button><button data-v="Otra">✨ Otra</button>
+</div>
+<div class="section">⏱️ Tiempo de actividad</div>
+<div class="duration-grid" id="durationChoices">
+<button class="duration-option" data-min="10" data-stars="1"><b>5–15 min</b><span>⭐ 1 estrella</span></button>
+<button class="duration-option" data-min="25" data-stars="2"><b>20–30 min</b><span>⭐⭐ 2 estrellas</span></button>
+<button class="duration-option" data-min="52" data-stars="3"><b>45–60 min</b><span>⭐⭐⭐ 3 estrellas</span></button>
+</div>
+<p class="small">Selecciona un solo rango por día. No necesitas escribir los minutos. Para la clasificación se contabiliza un bloque de actividad al día.</p>
+<div class="section">Intensidad</div>
+<div class="choices" id="intensity"><button data-v="Suave">🟢 Suave</button><button data-v="Moderada">🟡 Moderada</button><button data-v="Vigorosa">🔴 Vigorosa</button></div>
+<div class="card"><b>Guía rápida</b><p class="small">Suave: puedes conversar cómodamente. Moderada: respiras más rápido. Vigorosa: conversar cuesta.</p></div>
+<button class="primary" onclick="saveActivity()">Guardar actividad</button>
+</section>
+
+<section id="challenge" class="screen">
+<h1>🎯 Reto de 30 días</h1>
+<p class="muted">Tu meta se adapta a tu punto de partida y a cómo te va cada semana.</p>
+<div class="card"><span class="badge" id="cbadge">NIVEL 1</span><h2 id="ctitle">5 minutos de movimiento</h2><p class="muted" id="cdesc"></p><div class="success" id="adaptationMsg">Cada movimiento cuenta. Empieza de forma progresiva.</div><button class="primary" onclick="completeChallenge()">Registrar cumplimiento del día</button><p class="small" id="dayReward" style="margin-top:8px">Primero registra actividad para poder cerrar el día.</p></div>
+<div class="section">📅 Mi calendario</div><div class="card"><div class="days" id="days"></div></div>
+<div class="section">📝 Evaluación semanal</div><div class="card"><b id="weeklyTitle">Completa la semana para evaluar cómo te fue.</b><p class="small" id="weeklyHelp">La evaluación aparece al completar los días 7, 14, 21 y 28.</p><div class="choices" id="feedbackChoices" style="display:none"><button data-feedback="easy">😊 Fácil</button><button data-feedback="ok">🙂 Adecuado</button><button data-feedback="hard">😓 Me costó</button><button data-feedback="none">😴 No pude</button></div><button class="secondary" id="saveFeedback" style="display:none;width:100%;margin-top:10px" onclick="saveWeeklyFeedback()">Guardar evaluación</button></div>
+<div class="section">⭐ ¿Cómo se acumulan las estrellas?</div><div class="card"><div class="rule"><b>5–15 minutos → ⭐ 1</b></div><div class="rule"><b>20–30 minutos → ⭐⭐ 2</b></div><div class="rule"><b>45–60 minutos → ⭐⭐⭐ 3</b></div><p class="small" style="margin-bottom:0">Para que el reto sea justo, se registra un solo bloque principal de actividad por día. Las estrellas se calculan por el rango seleccionado y los días activos se contabilizan una sola vez.</p></div><div class="section">Progresión</div><div class="card"><div class="activity"><div class="icon">1</div><div><b>Empieza</b><div class="small">Pequeños movimientos cuentan.</div></div></div><div class="activity"><div class="icon">2</div><div><b>Construye</b><div class="small">Aumenta gradualmente según cómo te sientas.</div></div></div><div class="activity"><div class="icon">3</div><div><b>Mantén</b><div class="small">Combina caminata, fuerza y movilidad.</div></div></div></div>
+</section>
+
+
+
+<section id="team" class="screen">
+<h1>🏆 Clasificación</h1><p class="muted">Reto institucional · 30 días. Se muestran únicamente datos de actividad; la información de salud es privada.</p>
+<div class="card me"><b>👥 Mi equipo: <span id="myTeamName">—</span></b><p class="small" style="margin-bottom:0">Aquí puedes ver la clasificación institucional completa. Tu posición se calcula con días activos, estrellas y minutos acumulados.</p></div>
+<div class="section">🏆 Clasificación general</div>
+<div class="card" id="rankingList"><p class="small">Cargando clasificación…</p></div>
+<div class="section">Regla del ganador</div>
+<div class="card"><div class="rule"><b>1.º Días activos</b><br>La constancia durante los 30 días es el criterio principal.</div><div class="rule"><b>2.º Estrellas</b><br>Reconocen actividad, tiempo, intensidad y cumplimiento de la meta diaria.</div><div class="rule"><b>3.º Minutos acumulados</b><br>En caso de empate, se compara el tiempo total de actividad.</div><p class="small" style="margin-bottom:0">No se utilizan diagnósticos de salud para la clasificación.</p></div>
+<div class="section">🎯 Progreso institucional</div>
+<div class="card"><b id="institutionTitle">Cargando…</b><div class="progress"><div class="bar" id="institutionBar" style="width:0%"></div></div><div class="row"><span class="small" id="institutionMeta">0 minutos</span><b id="institutionPct">0%</b></div></div>
+</section>
+
+<section id="achievements" class="screen">
+<h1>🏆 Logros</h1><p class="muted">Reconoce la constancia.</p>
+<div class="grid"><div class="card">🥉<br><b>Primer paso</b><p class="small">5 días activos</p></div><div class="card">🔥<br><b>Constancia</b><p class="small">7 días seguidos</p></div><div class="card">❤️<br><b>En movimiento</b><p class="small">15 días activos</p></div><div class="card">🏅<br><b>Reto cumplido</b><p class="small">30 días</p></div></div>
+<div class="section">¿Cómo te fue?</div><div class="card"><div class="choices"><button>😊 Fácil</button><button>🙂 Adecuado</button><button>😓 Me costó</button><button>😴 No pude</button></div><p class="small">La respuesta servirá para ajustar próximos retos.</p></div>
+</section>
+</main>
+
+<nav class="nav">
+<button onclick="show('home')" id="nh">🏠<br>Inicio</button>
+<button onclick="show('challenge')" id="nc">🎯<br>Reto</button>
+<button class="nav-plus" onclick="show('activity')" id="na"><span>＋</span><br>Registrar</button>
+<button onclick="show('team')" id="nt">🏆<br>Ranking</button>
+<button onclick="show('account');renderAccount()" id="nac">👤<br>Perfil</button>
+</nav>
+<div class="toast" id="toast"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const CHALLENGE_START="2026-10-01";
+const CHALLENGE_ACTIVITY_END="2026-10-30";
+const CHALLENGE_END="2026-10-31";
+const CHALLENGE_DAYS=30;
+let profile={name:"",group:"",level:"",conditions:[],startedAt:""},day=1,mins=0,points=0,steps=0,streak=0;
+let selected={group:"",level:"",condition:"",type:"",intensity:"",durationMinutes:0,durationStars:0};
+let weekAdjust=0,completedDays=[],weeklyFeedback={},activityLog=[];
+const baseTargets={"Sedentario":[5,5,10,10,10,15,15],"Actividad ocasional":[15,15,20,20,25,25,30],"Actividad diaria":[30,30,35,35,40,40,45]};
+let supabaseClient=null,centralUserId=null,centralParticipantId=null,centralReady=false,centralSyncBusy=false,currentAuthUser=null;
+
+function initCentral(){
+  try{
+    if(typeof window.supabase==='undefined'||!window.MMC_SUPABASE_URL||!window.MMC_SUPABASE_KEY||window.MMC_SUPABASE_URL.includes('TU_'))return false;
+    supabaseClient=window.supabase.createClient(window.MMC_SUPABASE_URL,window.MMC_SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    supabaseClient.auth.onAuthStateChange((event,session)=>{
+      currentAuthUser=session?.user||null;centralUserId=session?.user?.id||null;centralReady=!!session?.user;
+      if(session?.user?.is_anonymous){supabaseClient.auth.signOut({scope:'local'});currentAuthUser=null;centralUserId=null;centralReady=false;return;}
+      if(session?.user)setCloudStatus(true,'Cuenta autenticada');
+    });
+    return true;
+  }catch(e){console.error('Supabase init',e);return false;}
+}
+function setCloudStatus(ok,text){const b=$('cloudStatus'),t=$('cloudStatusText');if(!b||!t)return;b.textContent=ok?'CUENTA':'SIN CONEXIÓN';t.textContent=text;b.style.background=ok?'#eaf6f5':'#ffeff1';b.style.color=ok?'#267b76':'#c64c59';}
+function isPermanentUser(){return !!currentAuthUser&&!currentAuthUser.is_anonymous&&!!currentAuthUser.email;}
+function bogotaDateISO(d=new Date()){
+  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Bogota',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+  const get=t=>parts.find(x=>x.type===t)?.value||'';
+  return `${get('year')}-${get('month')}-${get('day')}`;
+}
+function dateOnlyToUTC(key){return new Date(key+'T00:00:00Z');}
+function localDateISO(d=new Date()){return bogotaDateISO(d);}
+function challengeDayForDate(d=new Date()){
+  const key=typeof d==='string'?d:localDateISO(d);
+  const start=dateOnlyToUTC(CHALLENGE_START),cur=dateOnlyToUTC(key);
+  return Math.floor((cur-start)/86400000)+1;
+}
+function challengeStatus(){const key=localDateISO();if(key<CHALLENGE_START)return 'before';if(key>CHALLENGE_END)return 'after';if(key>CHALLENGE_ACTIVITY_END)return 'closing';return 'active';}
+function formatChallengeDate(key){return dateOnlyToUTC(key).toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});}
+
+async function getCurrentSession(){if(!supabaseClient)return null;const {data,error}=await supabaseClient.auth.getSession();if(error)return null;if(data.session?.user?.is_anonymous){await supabaseClient.auth.signOut({scope:'local'});return null;}if(data.session?.user){currentAuthUser=data.session.user;centralUserId=data.session.user.id;centralReady=true;setCloudStatus(true,'Cuenta autenticada');}return data.session;}
+async function finalizePendingRegistration(){
+  if(!supabaseClient||!isPermanentUser())return false;
+  const raw=localStorage.getItem('mmc_pending_registration');
+  let pending=null;try{pending=raw?JSON.parse(raw):null}catch(e){pending=null;}
+  const {data:existing}=await supabaseClient.from('participants').select('id,name,group_name,activity_level,started_at').eq('user_id',centralUserId).limit(1).maybeSingle();
+  if(existing){centralParticipantId=existing.id;localStorage.removeItem('mmc_pending_registration');return true;}
+  if(!pending)return false;
+  const {data:part,error}=await supabaseClient.from('participants').insert({user_id:centralUserId,name:pending.name,group_name:pending.group,activity_level:pending.level,started_at:pending.startedAt||new Date().toISOString()}).select('id').single();
+  if(error){console.error('participant insert',error);return false;}
+  centralParticipantId=part.id;
+  if(pending.conditions?.length){const {error:e2}=await supabaseClient.from('health_data').insert({participant_id:centralParticipantId,user_id:centralUserId,condition_name:pending.conditions.join(', ')});if(e2)console.error('health insert',e2);}
+  await centralSyncProgress();
+  localStorage.removeItem('mmc_pending_registration');
+  return true;
+}
+async function loadCloudParticipant(){
+  if(!supabaseClient||!isPermanentUser())return false;
+  try{
+    const finalized=await finalizePendingRegistration();
+    const {data:part,error}=await supabaseClient.from('participants').select('id,name,group_name,activity_level,started_at').eq('user_id',centralUserId).limit(1).maybeSingle();
+    if(error||!part)return finalized;
+    centralParticipantId=part.id;
+    profile.name=part.name||'';profile.group=part.group_name||'';profile.level=part.activity_level||'';profile.startedAt=part.started_at||new Date().toISOString();
+    const {data:health}=await supabaseClient.from('health_data').select('condition_name').eq('participant_id',centralParticipantId).maybeSingle();
+    profile.conditions=health?.condition_name?[health.condition_name]:[];
+    const {data:prog}=await supabaseClient.from('challenge_progress').select('*').eq('participant_id',centralParticipantId).maybeSingle();
+    if(prog){day=prog.day||1;mins=prog.minutes_active||0;points=prog.points||0;steps=prog.steps||0;streak=prog.streak||0;weekAdjust=prog.week_adjust||0;completedDays=Array.isArray(prog.completed_days)?prog.completed_days:[];weeklyFeedback=prog.weekly_feedback||{};}
+    const {data:acts}=await supabaseClient.from('activities').select('activity_date,activity_type,duration_minutes,intensity').eq('participant_id',centralParticipantId).order('activity_date',{ascending:true});
+    activityLog=(acts||[]).map(a=>({date:a.activity_date,type:a.activity_type,duration:a.duration_minutes,intensity:a.intensity}));
+    const {data:evals}=await supabaseClient.from('weekly_evaluations').select('week_number,feedback').eq('participant_id',centralParticipantId);
+    weeklyFeedback={};(evals||[]).forEach(e=>weeklyFeedback[e.week_number]=e.feedback);
+    update();show('home');return true;
+  }catch(e){console.error('load cloud participant',e);return false;}
+}
+function renderLoggedOutState(){}
+async function loginFromStart(){return loginAccount(true);}
+async function recoverFromStart(){return recoverPassword(true);}
+function renderAccount(){
+  if(!$('accountStatus'))return;
+  if(!isPermanentUser()){show('profile');return;}
+  $('accountNameDisplay').textContent=profile.name||'Mi participante';
+  $('accountTeamDisplay').textContent=profile.group||'Mi equipo';
+  $('accountCloudBadge').textContent='CUENTA PROTEGIDA';
+  $('accountTitle').textContent='🔐 Mi cuenta';
+  $('accountStatus').className='account-status ok';
+  $('accountStatus').textContent='Sesión activa con '+(currentAuthUser.email||'tu correo')+'. Tu inscripción y progreso están vinculados a esta cuenta.';
+  if($('loginBox'))$('loginBox').style.display='none';
+}
+async function loginAccount(fromStart=false){
+  if(!supabaseClient){alert('La conexión con la nube no está disponible.');return false;}
+  const email=$(fromStart?'startLoginEmail':'loginEmail').value.trim().toLowerCase();
+  const pw=$(fromStart?'startLoginPassword':'loginPassword').value;
+  if(!email||!pw){alert('Escribe correo y contraseña.');return false;}
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password:pw});
+  if(error){alert('No se pudo iniciar sesión: '+error.message);return false;}
+  currentAuthUser=data.user;centralUserId=data.user.id;centralReady=true;setCloudStatus(true,'Cuenta autenticada');
+  const ok=await loadCloudParticipant();
+  if(!ok){alert('La cuenta está autenticada, pero no encontramos una inscripción. Si acabas de confirmar tu correo, vuelve a intentar después de abrir el enlace de confirmación.');return false;}
+  toast('¡Bienvenido de nuevo! ❤️');return true;
+}
+async function recoverPassword(fromStart=false){
+  if(!supabaseClient){alert('La conexión con la nube no está disponible.');return;}
+  const email=$(fromStart?'startLoginEmail':'loginEmail').value.trim().toLowerCase();
+  if(!email){alert('Escribe primero tu correo.');return;}
+  const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin});
+  if(error){alert('No se pudo enviar el enlace: '+error.message);return;}
+  toast('Enlace de recuperación enviado 📧');
+}
+async function logoutPermanent(){
+  if(!isPermanentUser())return;
+  if(!confirm('¿Cerrar sesión? Tu progreso seguirá guardado y podrás volver a entrar con tu correo y contraseña.'))return;
+  await supabaseClient.auth.signOut({scope:'local'});currentAuthUser=null;centralUserId=null;centralParticipantId=null;centralReady=false;resetState();clearForm();setCloudStatus(false,'Inicia sesión para continuar');show('profile');toast('Sesión cerrada. Para volver a entrar, usa tu correo y contraseña.');
+}
+function clearForm(){document.querySelectorAll('.choices button').forEach(b=>b.classList.remove('sel'));['name','signupEmail','signupPassword','signupPassword2','loginEmail','loginPassword','startLoginEmail','startLoginPassword'].forEach(id=>{if($(id))$(id).value='';});}
+async function centralSyncProgress(){
+  if(!supabaseClient||!centralUserId||!centralParticipantId||centralSyncBusy)return;
+  centralSyncBusy=true;
+  try{
+    const row={participant_id:centralParticipantId,user_id:centralUserId,day,minutes_active:mins,steps,points,streak,week_adjust:weekAdjust,completed_days:completedDays,weekly_feedback:weeklyFeedback,updated_at:new Date().toISOString()};
+    const {error}=await supabaseClient.from('challenge_progress').upsert(row,{onConflict:'participant_id'});if(error)throw error;
+  }catch(e){console.error('progress sync',e);setCloudStatus(false,'No se pudo sincronizar temporalmente.');}
+  finally{centralSyncBusy=false;}
+}
+async function centralSaveActivity(item){
+  if(!supabaseClient||!centralUserId||!centralParticipantId)return false;
+  const {error}=await supabaseClient.from('activities').insert({participant_id:centralParticipantId,user_id:centralUserId,activity_type:item.type,duration_minutes:item.duration,intensity:item.intensity,activity_date:item.date});
+  if(error){console.error('activity sync',error);return false;}return true;
+}
+async function centralSaveFeedback(week,feedback){if(!supabaseClient||!centralUserId||!centralParticipantId)return false;const {error}=await supabaseClient.from('weekly_evaluations').upsert({participant_id:centralParticipantId,user_id:centralUserId,week_number:week,feedback,created_at:new Date().toISOString()},{onConflict:'participant_id,week_number'});if(error){console.error('feedback sync',error);return false;}return true;}
+
+function setupChoices(id,key){document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');selected[key]=b.dataset.v;});}
+['groups','levels','conditions','types','intensity'].forEach((id,i)=>setupChoices(id,['group','level','condition','type','intensity'][i]));
+document.querySelectorAll('#feedbackChoices button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#feedbackChoices button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');});
+document.querySelectorAll('#durationChoices button').forEach(b=>b.onclick=()=>{selected.durationMinutes=Number(b.dataset.min);selected.durationStars=Number(b.dataset.stars);document.querySelectorAll('#durationChoices button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');});
+
+$('start').onclick=async()=>{
+  const name=$('name').value.trim(),email=$('signupEmail').value.trim().toLowerCase(),password=$('signupPassword').value,password2=$('signupPassword2').value;
+  if(!name||!selected.group||!selected.level||!email||!password||!password2){alert('Completa todos los datos de inscripción, incluido correo y contraseña.');return;}
+  if(password.length<8){alert('La contraseña debe tener al menos 8 caracteres.');return;}
+  if(password!==password2){alert('Las contraseñas no coinciden.');return;}
+  const status=challengeStatus();if(status==='after'){alert('El periodo de inscripción terminó el 31 de octubre de 2026.');return;}
+  if(!supabaseClient){alert('La conexión con la nube no está disponible.');return;}
+  const session=await getCurrentSession();if(session?.user){if(await loadCloudParticipant()){alert('Ya tienes una inscripción activa en esta cuenta.');return;}await supabaseClient.auth.signOut({scope:'local'});currentAuthUser=null;centralUserId=null;centralParticipantId=null;}
+  const pending={name,group:selected.group,level:selected.level,conditions:selected.condition&&selected.condition!=='Ninguno'?[selected.condition]:[],startedAt:new Date().toISOString()};
+  localStorage.setItem('mmc_pending_registration',JSON.stringify(pending));
+  const {data,error}=await supabaseClient.auth.signUp({email,password,options:{emailRedirectTo:window.location.origin}});
+  if(error){localStorage.removeItem('mmc_pending_registration');alert('No se pudo crear la cuenta: '+error.message);return;}
+  if(data.session?.user){currentAuthUser=data.session.user;centralUserId=data.session.user.id;centralReady=true;const ok=await loadCloudParticipant();if(ok){toast('Inscripción creada correctamente ❤️');return;}}
+  alert('Inscripción iniciada. Revisa tu correo y confirma la dirección. Después vuelve a esta aplicación e inicia sesión con el mismo correo y contraseña para entrar al reto. ❤️');
+};
+
+function resetState(){profile={name:'',group:'',level:'',conditions:[],startedAt:''};selected={group:'',level:'',condition:'',type:'',intensity:'',durationMinutes:0,durationStars:0};day=1;mins=0;points=0;steps=0;streak=0;weekAdjust=0;completedDays=[];weeklyFeedback={};activityLog=[];}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function activeDayRecords(){const m={};for(const a of activityLog){const k=bogotaDateISO(new Date(a.date||''));if(!k||k==='NaN-NaN-NaN')continue;if(!m[k])m[k]={mins:0,vig:false};m[k].mins+=Number(a.duration)||0;if(a.intensity==='Vigorosa')m[k].vig=true;}return m;}
+function starsForDay(dateKey){const r=activeDayRecords()[dateKey];if(!r||r.mins<1)return 0;return r.mins>=45?3:r.mins>=20?2:1;}
+function recalcScore(){const rec=activeDayRecords();let total=0;for(const k of Object.keys(rec)){const cd=challengeDayForDate(k);if(cd>=1&&cd<=CHALLENGE_DAYS)total+=starsForDay(k);}points=total;const today=localDateISO();streak=0;let cursor=dateOnlyToUTC(today);for(let i=0;i<CHALLENGE_DAYS;i++){const k=cursor.toISOString().slice(0,10);if(rec[k]&&rec[k].mins>0){streak++;cursor.setUTCDate(cursor.getUTCDate()-1);}else break;}}
+function target(){const a=baseTargets[profile.level]||baseTargets['Sedentario'];const idx=Math.max(0,Math.min(a.length-1,(day||1)-1));return Math.max(5,a[idx]+weekAdjust);}
+function renderDays(){let html='';const active=activeDayRecords();for(let i=1;i<=CHALLENGE_DAYS;i++){let cls=i===day?'today':'';const d=new Date(dateOnlyToUTC(CHALLENGE_START));d.setUTCDate(d.getUTCDate()+i-1);const k=d.toISOString().slice(0,10);if(active[k]?.mins>0)cls+=' done';const icon=active[k]?.mins>0?'✓':i;html+=`<div class="daybox ${cls.trim()}"><b>${icon}</b>Día ${i}</div>`}$('days').innerHTML=html;}
+function updateWeeklyCard(){let completedWeek=day-1;let week=completedWeek>0?Math.floor(completedWeek/7):0;let checkpoint=completedWeek>0&&completedWeek%7===0;if(checkpoint&&!weeklyFeedback[week]){$('weeklyTitle').textContent='¡Terminaste la semana '+week+'! ¿Cómo te fue?';$('weeklyHelp').textContent='Tu respuesta ajustará suavemente la meta de la próxima semana.';$('feedbackChoices').style.display='grid';$('saveFeedback').style.display='block';}else{$('weeklyTitle').textContent=weeklyFeedback[week]?'Evaluación de la semana '+week+' guardada ❤️':'Completa la semana para evaluar cómo te fue.';$('weeklyHelp').textContent=weeklyFeedback[week]?'La próxima meta ya fue ajustada según tu respuesta.':'La evaluación aparece en los días 7, 14, 21 y 28.';$('feedbackChoices').style.display='none';$('saveFeedback').style.display='none';}}
+function update(){
+  if(!isPermanentUser()||!centralParticipantId)return;
+  recalcScore();const status=challengeStatus();let t=day<=CHALLENGE_DAYS?target():0;let p=Math.min(100,Math.round(Math.max(0,day-1)/CHALLENGE_DAYS*100));const activeCount=Object.values(activeDayRecords()).filter(x=>x.mins>0).length;
+  $('hello').textContent='¡Hola, '+profile.name+'!';$('topStatus').textContent=status==='before'?'INICIA 1 OCT':(day>CHALLENGE_DAYS?'COMPLETADO':'DÍA '+Math.min(day,CHALLENGE_DAYS)+' / '+CHALLENGE_DAYS);$('day').textContent=Math.min(day,CHALLENGE_DAYS);$('pct').textContent=p+'%';$('bar').style.width=p+'%';$('activeDays').textContent=activeCount;$('mins').textContent=mins;$('points').textContent=points;$('streak').textContent=streak;$('streakTop').textContent=streak;$('streakCard').textContent=streak+' '+(streak===1?'día':'días')+' de racha';$('starsCard').textContent=points+' '+(points===1?'estrella':'estrellas');$('summary').textContent=profile.level+' · '+profile.group;$('health').textContent=profile.conditions.length?'Diagnóstico registrado (privado).':'Sin diagnóstico registrado.';$('myTeamName').textContent=profile.group;
+  $('today').textContent=status==='before'?'⏳ El reto comienza el 1 de octubre':status==='closing'?'🏁 Cierre del reto: 31 de octubre':day>CHALLENGE_DAYS?'🎉 ¡Reto completado!':t+' minutos de movimiento';$('todayDesc').textContent=status==='before'?'Ya estás inscrito. El registro de actividad se habilitará el 1 de octubre.':status==='closing'?'Los 30 días de actividad ya terminaron. Este día queda para cierre y consolidación de resultados.':profile.level==='Actividad diaria'?'Mantén el ritmo y combina diferentes actividades.':'Empieza poco a poco; cada movimiento cuenta.';$('adaptationMsg').textContent=weekAdjust>0?'¡Muy bien! Aumentamos suavemente tu meta porque te fue fácil.':weekAdjust<0?'Vamos con calma. Reducimos suavemente la meta para que sea alcanzable.':'Meta personalizada para tu punto de partida.';let badge=profile.level==='Sedentario'?'NIVEL 1 · EMPIEZA':profile.level==='Actividad ocasional'?'NIVEL 2 · AVANZA':'NIVEL 3 · MANTÉN';$('badge').textContent=badge;$('cbadge').textContent=badge;$('ctitle').textContent=status==='before'?'El reto inicia el 1 de octubre':status==='closing'?'Cierre del reto':day>CHALLENGE_DAYS?'Reto completado':t+' minutos de movimiento';$('cdesc').textContent='30 días de actividad: '+formatChallengeDate(CHALLENGE_START)+' al '+formatChallengeDate(CHALLENGE_ACTIVITY_END)+'. Cierre: '+formatChallengeDate(CHALLENGE_END)+'.';
+  const todayKey=localDateISO(),todayRec=activeDayRecords()[todayKey];$('dayReward').textContent=todayRec?'Actividad registrada hoy: '+todayRec.mins+' min · estrellas del día: '+starsForDay(todayKey)+' ⭐':status==='before'?'Podrás registrar actividad a partir del 1 de octubre.':'Primero registra actividad para poder cerrar el día.';renderDays();updateWeeklyCard();renderAccount();if($('rankingList')&&document.getElementById('team').classList.contains('active'))loadRanking();
+}
+function showAccountSecurity(){const box=$('securityBox');if(box){box.scrollIntoView({behavior:'smooth',block:'start'});}renderAccount();}
+function showPrivacyInfo(){alert('🔒 Privacidad\n\nTu información de salud es opcional y solo está disponible para el panel administrativo autorizado. No aparece en el ranking público ni en la exportación de resultados.');}
+function show(id){if(!isPermanentUser()&&id!=='profile'){alert('Primero realiza la inscripción, confirma tu correo e inicia sesión.');return;}document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));let m={home:'nh',activity:'na',challenge:'nc',team:'nt',account:'nac'};if(m[id])$(m[id]).classList.add('active');window.scrollTo(0,0);if(id==='team')loadRanking();if(id==='account')renderAccount();}
+function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2200);}
+
+async function saveActivity(){
+  if(!isPermanentUser()||!centralParticipantId){alert('Primero realiza y valida tu inscripción.');show('profile');return;}
+  const officialDay=challengeDayForDate();if(officialDay<1){alert('El reto comienza el 1 de octubre de 2026.');return;}if(officialDay>CHALLENGE_DAYS){alert('El reto oficial terminó el 31 de octubre de 2026.');return;}
+  if(!selected.type||!selected.intensity){alert('Selecciona tipo e intensidad.');return;}if(!selected.durationMinutes){alert('Selecciona uno de los tres rangos de tiempo.');return;}
+  const todayKey=localDateISO();if(activeDayRecords()[todayKey]?.mins>0){alert('Ya registraste la actividad de hoy. Solo se permite un bloque principal por día.');return;}
+  const startIso=todayKey+'T00:00:00-05:00',endIso=todayKey+'T23:59:59.999-05:00';const {data:existing,error:existingError}=await supabaseClient.from('activities').select('id').eq('participant_id',centralParticipantId).gte('activity_date',startIso).lte('activity_date',endIso).limit(1);if(existingError){alert('No pudimos verificar la actividad de hoy. Inténtalo de nuevo.');return;}if(existing?.length){alert('Ya existe una actividad registrada para hoy.');await loadCloudParticipant();return;}
+  const item={date:new Date().toISOString(),type:selected.type,duration:selected.durationMinutes,intensity:selected.intensity,duration_band:selected.durationStars};
+  const saved=await centralSaveActivity(item);if(!saved){alert('No se pudo guardar la actividad en la base central. No se sumaron minutos.');return;}
+  activityLog.push(item);mins+=selected.durationMinutes;steps+=Math.round(selected.durationMinutes*105);day=officialDay;if(!completedDays.includes(day))completedDays.push(day);recalcScore();update();await centralSyncProgress();selected.type='';selected.intensity='';selected.durationMinutes=0;selected.durationStars=0;document.querySelectorAll('#types button,#intensity button,#durationChoices button').forEach(b=>b.classList.remove('sel'));toast('Actividad guardada ❤️ · hoy ganas '+starsForDay(todayKey)+' ⭐');show('home');
+}
+async function saveWeeklyFeedback(){let chosen=$('feedbackChoices').querySelector('button.sel');if(!chosen){alert('Selecciona cómo te fue.');return;}let week=Math.floor((day-1)/7);weeklyFeedback[week]=chosen.dataset.feedback;if(chosen.dataset.feedback==='easy')weekAdjust=5;else if(chosen.dataset.feedback==='hard')weekAdjust=0;else if(chosen.dataset.feedback==='none')weekAdjust=-5;else weekAdjust=2;const saved=await centralSaveFeedback(week,chosen.dataset.feedback);if(!saved){alert('No se pudo guardar la evaluación.');return;}update();await centralSyncProgress();toast('Evaluación guardada en la nube. Meta ajustada ❤️');}
+function completeChallenge(){if(!isPermanentUser()){alert('Primero inicia sesión.');return;}const officialDay=challengeDayForDate();if(officialDay<1){alert('El reto comienza el 1 de octubre de 2026.');return;}if(officialDay>CHALLENGE_DAYS){toast('¡Reto de 30 días completado! 🏆');return;}const todayKey=localDateISO(),rec=activeDayRecords()[todayKey];if(!rec||rec.mins<1){alert('Registra al menos una actividad hoy antes de cerrar el día.');show('activity');return;}day=officialDay;if(!completedDays.includes(day)){completedDays.push(day);const stars=starsForDay(todayKey);toast('¡Día '+day+' completado! +'+stars+' ⭐');if(day===CHALLENGE_DAYS){day=CHALLENGE_DAYS+1;toast('🎉 ¡Completaste los 30 días! 🏆');}else day++;}else toast('Ese día ya está completado.');update();}
+async function loadRanking(){const box=$('rankingList');if(!box||!supabaseClient)return;const {data,error}=await supabaseClient.rpc('get_public_ranking');if(error){box.innerHTML='<p class="small">Aún no se puede cargar la clasificación. Verifica la configuración central.</p>';return;}const rows=data||[];if(!rows.length){box.innerHTML='<p class="small">Todavía no hay participantes con actividad registrada.</p>';return;}box.innerHTML=rows.map((r,i)=>{const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'.';const me=centralParticipantId&&r.participant_id===centralParticipantId?' me':'';const tag=me?' <span class="small">· Tú</span>':'';return `<div class="rank${me}">${medal}<div><b>${escapeHtml(r.display_name)}</b>${tag}<small>${escapeHtml(r.group_name||'')} · ${r.active_days} días · ${r.total_minutes} min</small></div><strong>${r.points} ⭐</strong></div>`}).join('');const totals=rows.reduce((a,r)=>a+Number(r.total_minutes||0),0);const pct=Math.min(100,Math.round(totals/5000*100));$('institutionTitle').textContent=rows.length+' participantes · '+totals+' minutos acumulados';$('institutionMeta').textContent=totals.toLocaleString('es-CO')+' / 5.000 min';$('institutionPct').textContent=pct+'%';$('institutionBar').style.width=pct+'%';}
+
+(async function(){
+  const hasCentral=initCentral();if(!hasCentral){setCloudStatus(false,'Configura la conexión central para continuar.');show('profile');return;}
+  const session=await getCurrentSession();
+  if(session?.user&&!session.user.is_anonymous){const restored=await loadCloudParticipant();if(restored)return;}
+  resetState();renderLoggedOutState();setCloudStatus(false,'Completa la inscripción para comenzar');show('profile');
+})();
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

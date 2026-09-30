@@ -1,0 +1,10 @@
+{
+  "name": "Muévete más por tu corazón",
+  "short_name": "Muévete más",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4f7f8",
+  "theme_color": "#e85d68",
+  "lang": "es",
+  "icons": []
+}
